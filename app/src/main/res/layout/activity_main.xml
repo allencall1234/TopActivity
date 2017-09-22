@@ -64,7 +64,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="开启基线,TEF等App自动密码填充功能" />
+                android:text="开启即有宝/钱包自动密码填充功能" />
 
             <Switch
                 android:id="@+id/auto_compelete_switch"
@@ -90,8 +90,23 @@
                 android:id="@+id/auto_compelete_text"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_alignParentRight="true" />
+                android:layout_alignParentRight="true"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/auto_compelete_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="16dp"
+                android:src="@android:drawable/ic_input_add" />
         </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/code_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:id="@+id/modify_text_color"

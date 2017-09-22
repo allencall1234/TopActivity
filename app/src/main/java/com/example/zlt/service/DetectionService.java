@@ -12,7 +12,9 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.text.TextUtilsCompat;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -21,6 +23,7 @@ import com.example.zlt.activity.FloatWidnow;
 import com.example.zlt.utils.SPHelper;
 
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -34,8 +37,8 @@ public class DetectionService extends AccessibilityService {
     public static final String ACTION_UPDATE_UI = "action_update_ui";
     private BroadcastReceiver receiver = new InnerBroadcastReceiver();
 
-    private static final String CLASS_NAME_SUFFIX = ".ACT_UserLogin";
-    private static final String CLASS_DEFAULT_SUFFIX = ".ACT_UserLoginDefault";
+    private static final String CLASS_NAME_SUFFIX = ".VerifyPwdActivity";
+    private static final String CLASS_DEFAULT_SUFFIX = ".VerifyPwdActivity";
 
     @Override
     protected void onServiceConnected() {
@@ -76,10 +79,10 @@ public class DetectionService extends AccessibilityService {
 
     private void autoComplete(String acName) {
         if (acName.endsWith(CLASS_NAME_SUFFIX) || acName.endsWith(CLASS_DEFAULT_SUFFIX)) {
-            String id_base = "com.huawei.iot.smarthome:id/user_login_account_edt";
-            String id_tef_brazil = "br.vivo.smarthome:id/user_login_account_edt";
-            String id_tef_chile = "cl.com.movistar.smarthome:id/user_login_account_edt";
-            String id_tef_peru = "pe.com.movistar.smarthome:id/user_login_account_edt";
+            String id_corder_pwd = "com.giveu.corder:id/et_pwd";//com.giveu.corder:id/tv_userId
+            String id_mall_pwd = "com.giveu.shoppingmall:id/et_pwd";//com.giveu.shoppingmall:id/tv_userId
+            String id_corder_userId = "com.giveu.corder:id/tv_userId";
+            String id_mall_userId = "com.giveu.shoppingmall:id/tv_userId";
             AccessibilityNodeInfo accessibilityNodeInfo = null;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
                 accessibilityNodeInfo = getRootInActiveWindow();
@@ -87,27 +90,39 @@ public class DetectionService extends AccessibilityService {
 
             if (accessibilityNodeInfo != null) {
                 List<AccessibilityNodeInfo> nodeInfos = null;
+                List<AccessibilityNodeInfo> userIdInfos = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                    nodeInfos = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId(id_base);
+                    nodeInfos = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId(id_corder_pwd);
+                    userIdInfos = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId(id_corder_userId);
 
                     if (nodeInfos == null || nodeInfos.size() == 0) {
-                        nodeInfos = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId(id_tef_brazil);
+                        nodeInfos = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId(id_mall_pwd);
                     }
 
-                    if (nodeInfos == null || nodeInfos.size() == 0) {
-                        nodeInfos = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId(id_tef_chile);
+                    if (userIdInfos == null || userIdInfos.size() == 0) {
+                        userIdInfos = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId(id_mall_userId);
                     }
 
-                    if (nodeInfos == null || nodeInfos.size() == 0) {
-                        nodeInfos = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId(id_tef_peru);
+                    CharSequence userId = "";
+                    CharSequence pwd = "";
+                    if (userIdInfos != null && userIdInfos.size() != 0) {
+                        userId = userIdInfos.get(0).getText();
+                        String result = SPHelper.getAutoCompeleteText(DetectionService.this);
+                        if (!TextUtils.isEmpty(userId) && !TextUtils.isEmpty(result)) {
+                            Pattern pattern = Pattern.compile(userId + "::(.*?)(:|$)");
+                            Matcher matcher = pattern.matcher(result);
+                            while (matcher.find()) {
+                                pwd = matcher.group(1);
+                            }
+                        }
                     }
 
-                    if (nodeInfos != null || nodeInfos.size() == 0) {
+                    if (nodeInfos != null && nodeInfos.size() != 0) {
                         CharSequence text = nodeInfos.get(0).getText();
                         Pattern pattern = Pattern.compile("\\d+");
-                        if (!pattern.matcher(text).find()) {
+                        if (!pattern.matcher(text).find() && !text.toString().startsWith("•")) {
                             ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                            ClipData clipData = ClipData.newPlainText("text", SPHelper.getAutoCompeleteText(DetectionService.this));
+                            ClipData clipData = ClipData.newPlainText("text", pwd);
                             clipboardManager.setPrimaryClip(clipData);
                             nodeInfos.get(0).performAction(AccessibilityNodeInfo.ACTION_FOCUS);
                             nodeInfos.get(0).performAction(AccessibilityNodeInfo.ACTION_PASTE);

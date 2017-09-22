@@ -48,7 +48,7 @@ public class SPHelper {
 
     public static String getAutoCompeleteText(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getString("autocompelete_text", "*#*#8443#*#*");
+        return sp.getString("autocompelete_text", "");
     }
 
     public static void setAutoCompeleteText(Context context, String text) {

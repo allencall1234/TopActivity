@@ -9,6 +9,8 @@ import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -16,14 +18,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.example.zlt.adapter.PwdAdapter;
+import com.example.zlt.entity.PwdBean;
 import com.example.zlt.library.ColorPickerDialog;
 import com.example.zlt.service.DetectionService;
 import com.example.zlt.utils.SPHelper;
+
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, ColorPickerDialog.OnColorPickedListener {
@@ -39,6 +49,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private RelativeLayout autoCompleteLayout0 = null;
 
     private LinearLayout outLayout = null;
+    private RecyclerView codeList = null;
+    private List<PwdBean> codes = null;
+    private PwdAdapter mAdapter = null;
+    private ImageView ivAdd = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +82,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         autoCompleteLayout0 = (RelativeLayout) findViewById(R.id.auto_compelete_layout0);
         autoCompleteEditText.setText(SPHelper.getAutoCompeleteText(this));
         autoCompeleteSwith.setOnCheckedChangeListener(this);
+        ivAdd = (ImageView) findViewById(R.id.auto_compelete_add);
+        ivAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                codes.add(new PwdBean("", ""));
+                mAdapter.notifyDataSetChanged();
+            }
+        });
         autoCompleteEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -85,6 +107,17 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             public void afterTextChanged(Editable editable) {
             }
         });
+        codeList = (RecyclerView) findViewById(R.id.code_list);
+        String pwdAndAccounts = SPHelper.getAutoCompeleteText(this);
+        String[] array = pwdAndAccounts.split("::");
+        codes = new ArrayList<>();
+        if (array.length >= 2) {
+            for (int i = 0; i < array.length; i += 2) {
+                codes.add(new PwdBean(array[i], array[i + 1]));
+            }
+        }
+        codeList.setAdapter(mAdapter = new PwdAdapter(this, codes));
+        codeList.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
