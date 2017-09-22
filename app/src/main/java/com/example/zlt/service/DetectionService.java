@@ -120,7 +120,8 @@ public class DetectionService extends AccessibilityService {
                     if (nodeInfos != null && nodeInfos.size() != 0) {
                         CharSequence text = nodeInfos.get(0).getText();
                         Pattern pattern = Pattern.compile("\\d+");
-                        if (!pattern.matcher(text).find() && !text.toString().startsWith("•")) {
+                        if (TextUtils.isEmpty(text) ||
+                                (!pattern.matcher(text).find() && !text.toString().startsWith("•"))) {
                             ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                             ClipData clipData = ClipData.newPlainText("text", pwd);
                             clipboardManager.setPrimaryClip(clipData);
