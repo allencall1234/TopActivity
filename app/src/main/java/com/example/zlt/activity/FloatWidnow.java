@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.android.permission.FloatWindowManager;
 import com.example.zlt.utils.SPHelper;
 
 /**
@@ -25,7 +26,7 @@ public class FloatWidnow {
 
     private static boolean showing = false;
 
-    public static void init(Context context){
+    public static void init(Context context) {
         windowManager = (WindowManager) context.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         layoutParams = new WindowManager.LayoutParams();
         layoutParams.x = 0;
@@ -33,8 +34,8 @@ public class FloatWidnow {
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
         layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
         layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE| WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-        layoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        layoutParams.type = WindowManager.LayoutParams .TYPE_SYSTEM_ERROR;
         layoutParams.format = PixelFormat.TRANSLUCENT;
 
         inflater = (LayoutInflater) context.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -44,14 +45,19 @@ public class FloatWidnow {
         acName = (TextView) floatView.findViewById(R.id.activity_name);
     }
 
-    public static void show(Context context, CharSequence packageName, CharSequence activityName){
+    public static void show(Context context, CharSequence packageName, CharSequence activityName) {
 
-        if (windowManager == null){
+        if (!FloatWindowManager.getInstance().checkPermission(context)) {
+            FloatWindowManager.getInstance().applyPermission(context);
+            return;
+        }
+
+        if (windowManager == null) {
             init(context);
         }
 
-        if (!showing){
-            windowManager.addView(floatView,layoutParams);
+        if (!showing) {
+            windowManager.addView(floatView, layoutParams);
             showing = true;
         }
 
@@ -61,14 +67,14 @@ public class FloatWidnow {
             pkName.setVisibility(View.VISIBLE);
             pkName.setText(packageName);
             pkName.setTextColor(Color.parseColor(color));
-        }else {
+        } else {
             pkName.setVisibility(View.GONE);
         }
         acName.setText(activityName);
         acName.setTextColor(Color.parseColor(color));
     }
 
-    public static void dismiss(){
+    public static void dismiss() {
         if (showing) {
             windowManager.removeView(floatView);
             showing = false;

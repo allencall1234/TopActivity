@@ -53,11 +53,13 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private List<PwdBean> codes = null;
     private PwdAdapter mAdapter = null;
     private ImageView ivAdd = null;
+    public static MainActivity instance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        instance = this;
 
         //总辅助服务开启模块
         showOrDismiss = (Switch) findViewById(R.id.show_dismiss_dialog);

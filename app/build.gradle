@@ -18,11 +18,13 @@ android {
         }
     }
     dexOptions {
-        incremental true
         jumboMode true
     }
 }
 
 dependencies {
     compile project(':library')
+    compile project(':permission')
+    compile "com.android.support:recyclerview-v7:25.3.1"
+    compile "com.android.support:appcompat-v7:25.3.1"
 }

@@ -2,6 +2,7 @@ package com.example.zlt.service;
 
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
@@ -19,7 +20,9 @@ import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.example.zlt.MyApp;
 import com.example.zlt.activity.FloatWidnow;
+import com.example.zlt.activity.MainActivity;
 import com.example.zlt.utils.SPHelper;
 
 import java.util.List;
@@ -138,7 +141,7 @@ public class DetectionService extends AccessibilityService {
         if (SPHelper.isShowWindow(DetectionService.this)) {
             packageName = pkName;
             activityName = acName;
-            FloatWidnow.show(DetectionService.this, packageName, activityName);
+            FloatWidnow.show(MainActivity.instance, packageName, activityName);
         } else {
             FloatWidnow.dismiss();
         }

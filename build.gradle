@@ -2,12 +2,12 @@
 
 buildscript {
     repositories {
-        maven {
-            url '/Applications/Android Studio.app/Contents/gradle/m2repository'
-        }
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:3.1.2'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -16,12 +16,10 @@ buildscript {
 
 allprojects {
     repositories {
-        maven {
-            url '/Applications/Android Studio.app/Contents/gradle/m2repository'
-        }
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        jcenter()
+        mavenCentral()
 
-        dependencies {
-        }
     }
 }
 
